@@ -30,11 +30,19 @@ namespace Gmusicapi
 			ScriptScope pyScope = pyEngine.CreateScope();
 			
 			pyEngine.Execute("import sys", pyScope);
+            var ourSelf = System.Reflection.Assembly.GetExecutingAssembly();
+            var codeBase = ourSelf.CodeBase;
+            if (codeBase.StartsWith("file:///"))
+            {
+                codeBase = codeBase.Substring("file:///".Length);
+            }
+            var dir = System.IO.Path.GetDirectoryName(codeBase);
+            Console.WriteLine("Using dir: {0}", dir);
 			//needed for the IronPyCrypto.dll
-			pyEngine.Execute("sys.path.insert(0, '" + AppDomain.CurrentDomain.BaseDirectory.Replace("\\", "/") + "')", pyScope);
+			pyEngine.Execute("sys.path.insert(0, '" + dir.Replace("\\", "/") + "')", pyScope);
 			//import Lib from zip file
-			pyEngine.Execute("sys.path.insert(1, '" + AppDomain.CurrentDomain.BaseDirectory.Replace("\\", "/") + "Resources/Lib.zip')", pyScope);
-			pyEngine.Execute("sys.path.insert(2, '" + AppDomain.CurrentDomain.BaseDirectory.Replace("\\", "/") + "Resources/Lib.zip/site-packages')", pyScope);
+			pyEngine.Execute("sys.path.insert(1, '" + dir.Replace("\\", "/") + "/Resources/Lib.zip')", pyScope);
+			pyEngine.Execute("sys.path.insert(2, '" + dir.Replace("\\", "/") + "/Resources/Lib.zip/site-packages')", pyScope);
 
 			pyEngine.Execute("from gmusicapi import Mobileclient", pyScope);
 			pyEngine.Execute("import datetime", pyScope);
